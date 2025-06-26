@@ -1,0 +1,13 @@
+version: 2
+mergeable:
+  - when: pull_request.*
+    validate:
+      - do: approvals
+        min:
+          count: 1
+          message: "You need at least one approval to merge this PR"
+        block:
+          changes_requested: true
+          message: "The PR contains change requests that needs to be resolved before merge
+        limit:
+          teams: ['org/Developers']
