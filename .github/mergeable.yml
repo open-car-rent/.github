@@ -11,6 +11,3 @@ mergeable:
           message: "The PR contains change requests that needs to be resolved before merge"
         limit:
           teams: ['org/Developers']
-      - do: request_review
-        reviewers: ['wmunoze99']
-        teams: ['Developers']
