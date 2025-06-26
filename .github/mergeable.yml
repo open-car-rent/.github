@@ -12,4 +12,5 @@ mergeable:
         limit:
           teams: ['org/Developers']
       - do: request_review
+        reviewers: ['wmunoze99']
         teams: ['Developers']
