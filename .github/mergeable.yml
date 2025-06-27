@@ -27,8 +27,8 @@ mergeable:
       # Security File Protection
       - do: changeset
         must_exclude:
-          file: ['.env*', '*.env', 'secrets/**', '*.key', '*.pem', '*.p12', '*.pfx', 'config/production.*', '*.secret', 'entrypoint.sh', 'Dockerfile']
-          message: "🚨 Be careful you're modifying sensible files"
+          file: ['.env*', '*.env', 'secrets/**', '*.key', '*.pem', '*.p12', '*.pfx', 'config/production.*', '*.secret']
+          message: "🚨 Security files cannot be modified via PR. Please contact admin team."
       
       # Prevent Direct Commits to Main (blocks PRs from main-like branches)
       - do: dependent
@@ -77,18 +77,6 @@ mergeable:
         message:
           regex: '^(feat|fix|docs|style|refactor|test|chore|ci|perf)(\(.+\))?: .{1,72}$'
           message: "📝 Commit messages must follow conventional format: type(scope): description. Types: feat, fix, docs, style, refactor, test, chore, ci, perf"
-
-  # Auto-delete branch on merge
-  - when: pull_request.closed
-    validate:
-      - do: dependent
-        changed:
-          file: '*'
-        required:
-          status: 'merged'
-    pass:
-      - do: delete
-        delete_branch: true
 
   # Stale PR Management - Check daily and delete stale PRs
   - when: schedule.repository
