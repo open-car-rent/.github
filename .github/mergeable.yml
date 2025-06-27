@@ -10,41 +10,20 @@ mergeable:
       - do: request_review
         team_reviewers: ['org/Developers']
 
-  # Auto-comment on develop to main PRs (since auto-approve might not be available)
-  - when: pull_request.opened, pull_request.synchronize
-    validate:
-      - do: dependent
-        base: 'main'
-        head: 'develop'
-    pass:
-      - do: comment
-        payload:
-          body: "🚀 **Auto-Release PR**: develop → main detected. This PR is exempt from manual approval requirements."
-      - do: labels
-        add: ['auto-release', 'develop-to-main']
-
-  # Main approval and validation rules - EXCLUDE develop→main from approval requirements
+  # Approval requirements for ALL PRs
   - when: pull_request.*, pull_request_review.*, pull_request.synchronize
     validate:
-      # Skip approval requirements for develop→main PRs
-      - do: dependent
-        base:
-          must_exclude:
-            regex: '^main$'
-            head: '^develop$'
-        required:
-          # Only require approvals for non develop→main PRs
-          - do: approvals
-            min:
-              count: 1
-              message: "You need at least one approval to merge this PR"
-            block:
-              changes_requested: true
-              message: "The PR contains change requests that needs to be resolved before merge"
-            limit:
-              teams: ['org/Developers']
+      - do: approvals
+        min:
+          count: 1
+          message: "You need at least one approval to merge this PR"
+        block:
+          changes_requested: true
+          message: "The PR contains change requests that needs to be resolved before merge"
+        limit:
+          teams: ['org/Developers']
 
-  # Stale PR Management - Check daily and delete stale PRs
+  # Stale PR Management
   - when: schedule.repository
     validate:
       - do: stale
@@ -64,7 +43,6 @@ mergeable:
       - do: labels
         add: ['stale', 'auto-close-pending']
   
-  # Actually close stale PRs after warning period
   - when: schedule.repository
     validate:
       - do: stale
