@@ -10,8 +10,18 @@ mergeable:
       - do: request_review
         team_reviewers: ['org/Developers']
 
-  # Main approval and validation rules
-  - when: pull_request.*, pull_request_review.*
+  # Auto-approve develop to main PRs
+  - when: pull_request.opened, pull_request.synchronize
+    validate:
+      - do: dependent
+        base: 'main'
+        head: 'develop'
+    pass:
+      - do: approve
+        message: "🚀 Auto-approved: develop → main release PR"
+
+  # Main approval and validation rules (UPDATED with synchronize event)
+  - when: pull_request.*, pull_request_review.*, pull_request.synchronize
     validate:
       # Existing approval requirements
       - do: approvals
