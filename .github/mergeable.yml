@@ -10,7 +10,7 @@ mergeable:
       - do: request_review
         team_reviewers: ['org/Developers']
 
-  # Approval requirements for ALL PRs
+  # Approval requirements for regular PRs (not develop→main)
   - when: pull_request.*, pull_request_review.*, pull_request.synchronize
     validate:
       - do: approvals
@@ -22,6 +22,22 @@ mergeable:
           message: "The PR contains change requests that needs to be resolved before merge"
         limit:
           teams: ['org/Developers']
+
+  # Auto-pass rule specifically for develop→main PRs
+  - when: pull_request.*, pull_request_review.*
+    validate:
+      - do: title
+        must_include:
+          regex: '.*'
+          message: "develop→main PRs are auto-approved"
+    pass:
+      - do: comment
+        payload:
+          body: "🚀 Auto-approved: develop → main release PR"
+    filter:
+      - do: repository
+        base: 'main'
+        head: 'develop'
 
   # Stale PR Management
   - when: schedule.repository
